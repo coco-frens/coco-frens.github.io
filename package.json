@@ -1,6 +1,6 @@
 {
-  "hpomepage":"coco-frens.github.io/aicoco",
-  "name": "aicoco",
+  "name": "cocoethtoken",
+  "homepage":"https://coco-frens.github.io/coco-frens",
   "private": true,
   "version": "0.0.0",
   "type": "module",

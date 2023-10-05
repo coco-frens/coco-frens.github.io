@@ -1,8 +1,11 @@
-body {
-  background-image: url('coco.jpeg');
+:root {
+  background-image: url('assets/coco.jpeg');
   background-repeat: repeat;
   background-position: center center;
-  margin: 0;
+}
+
+body,
+html {
   font-family: Arial, sans-serif;
   color: #e0e0d8;
   display: flex;
@@ -10,15 +13,30 @@ body {
   align-items: center;
 }
 
-header, main, footer {
-  width: 100%;
-  max-width: 1200px; /* This will make sure your content doesn't stretch too much on wider screens */
+.main {
+  height: 100%;
+  margin-right: 15%;
+  margin-left: 15%;
+  margin-top: 0.5%;
+  margin-bottom: 3%;
 }
 
-header {
+.header {
   background-color: #6d6c50;
   color: #fff;
   padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.section {
+  margin-bottom: 20px;
+  background-color: #404040;
+  padding: 20px;
+  border-radius: 20px;
+  width: 100%;
   text-align: center;
 }
 
@@ -36,30 +54,24 @@ nav a {
   margin: 0 15px;
 }
 
-main {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
-main section {
-  margin-bottom: 20px;
-  background-color: #404040;
-  padding: 20px;
-  border-radius: 5px;
-  width: 100%;
-  text-align: center;
-}
-
-main section#story {
+.story {
   background-color: #505050;
 }
 
-main section#community {
+.community {
   background-color: #606060;
 }
+
 /* ... existing styles ... */
+
+.social {
+  background-color: #404040;
+}
+
+.supporters {
+  background-color: #404040;
+}
 
 #social-links ul {
   list-style-type: none;
@@ -74,9 +86,11 @@ main section#community {
 }
 
 #social-links ul li a img {
-  width: 50px; /* or the size you want */
+  width: 50px;
+  /* or the size you want */
   height: auto;
-  border-radius: 50%; /* for rounded icons */
+  border-radius: 50%;
+  /* for rounded icons */
 }
 
 footer {
