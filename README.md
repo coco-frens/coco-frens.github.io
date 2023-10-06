@@ -2,7 +2,7 @@
 
 There is a branch called `production` which will hold exactly what is being served live on the website at the time. the way this is configured is that we are using [gh-pages](https://github.com/tschaub/gh-pages) to build react to a new branch called `gh-pages` which is then served.
 
-Currently `master` holds the original HTML version of the website, and the work in react is currently being done on the `aicoco` branch.
+Currently `master` holds the original HTML version of the website, and the work in react is currently being done on the `aicoco` branch. 
 
 
 # React + TypeScript + Vite
