@@ -1,3 +1,6 @@
+
+import { Link } from 'react-router-dom'
+
 import xLogo from '../assets/x.jpeg'
 import dextoolsLogo from '../assets/dextools.jpeg'
 import telegramLogo from '../assets/tg.png'
@@ -5,10 +8,13 @@ import discordLogo from '../assets/discord.png'
 import mediumLogo from '../assets/medium.png'
 import githubLogo from '../assets/github.png'
 
+
+const showMintingSite = true
+
 function Index() {
 
   return (
-    <div className="main">
+    <div className="container">
       <header className="header">
         <nav>
           <ul>
@@ -26,10 +32,10 @@ function Index() {
         </div>
       </header>
 
-
       <div className="section story">
         <h2>Our Story</h2>
         <p>Content to be added later</p>
+        {showMintingSite && <Link to="Mint">Mint Some AiCoco!</Link>}
       </div>
 
       <div className="section community">
@@ -54,7 +60,7 @@ function Index() {
       <div className="section supporters">
         <h2>Community Supporters</h2>
         thanks to kenyruyter@gmail.com for managing the dextools update!<br />
-          thanks to BitcoinJake for inspiring the website<br />
+        thanks to BitcoinJake for inspiring the website<br />
         thanks to Godder for rebooting the telegrams and facebooks<br />
       </div>
 

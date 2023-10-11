@@ -1,3 +1,8 @@
+# COCO community site
+
+The community site is built with React and Redux, but uses Typescript and [Vite](https://github.com/vitejs/vite) as its template generator.
+
+
 # Flow of git branches
 
 There is a branch called `production` which will hold exactly what is being served live on the website at the time. the way this is configured is that we are using [gh-pages](https://github.com/tschaub/gh-pages) to build react to a new branch called `gh-pages` which is then served.
