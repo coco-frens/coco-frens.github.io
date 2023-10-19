@@ -73,6 +73,7 @@ function MintControls() {
     })
     return map
   }
+
   const { isFetching, refetch } = useContractReads({
     contracts: [
       { address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'totalBurned' },

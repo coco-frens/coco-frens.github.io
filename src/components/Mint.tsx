@@ -4,9 +4,15 @@ import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { updateCalc } from '../features/math/math-slice.ts'
 import { setContractData, initedState } from '../features/web3/web3-slice.ts'
 
-import { useAccount, useConnect, useContractReads, useEnsName, useNetwork } from 'wagmi';
-import { InjectedConnector } from 'wagmi/connectors/injected'
+import { 
+  useAccount, 
+  useConnect, 
+  useContractReads, 
+  useEnsName, 
+  useNetwork 
+} from 'wagmi'
 
+import { InjectedConnector } from 'wagmi/connectors/injected'
 import { Form, Field } from 'react-final-form'
 import MintControls from './MintControls.tsx'
 
@@ -27,12 +33,17 @@ function Mint() {
   const { connect, connectors, error: connectionError } = useConnect({
     connector: new InjectedConnector(),
     onSuccess(connectionData){
-      switch (chain.name) {
-        case 'Goerli':
+
+      switch (chain.id) {
+        case 5: // Goerli
           aiCocoContractAddress = '0x87c87C7B624027d82D8c177054D5FcBcAC1bA3A6'
           cocoContractAddress =  '0xf05b8B90D99B7eDacC270d8A7db6C36F1DD63f72'
           break
-        case 'Ethereum':
+        case 11155111: // sepolia
+          aiCocoContractAddress = '0x990DB6C221C01e7E1192652c71c3846665E21441'
+          cocoContractAddress = '0xfe9ea3a9f788aa97faba8c4fa280d9f36373f253'
+          break
+        case 1: // mainnet
           aiCocoContractAddress = 'somewhereonmainnet'
           cocoContractAddress = '0xE6DBeAdD1823B0BCfEB27792500b71e510AF55B3'
           break

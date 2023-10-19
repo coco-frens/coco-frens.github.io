@@ -6,11 +6,11 @@ import { Provider } from 'react-redux'
 import { store } from './app/store'
 import './index.css'
 
-import { WagmiConfig, createConfig, configureChains, mainnet } from 'wagmi'
+import { WagmiConfig, createConfig, configureChains, mainnet, sepolia } from 'wagmi'
 import { goerli } from 'wagmi/chains'
 import { publicProvider } from 'wagmi/providers/public'
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet, goerli],
+  [mainnet, goerli, sepolia],
   [publicProvider()],
 )
 const config = createConfig({

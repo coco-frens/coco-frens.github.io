@@ -7,6 +7,7 @@ import telegramLogo from '../assets/tg.png'
 import discordLogo from '../assets/discord.png'
 import mediumLogo from '../assets/medium.png'
 import githubLogo from '../assets/github.png'
+import fire256 from '../assets/fire256.png'
 
 
 const showMintingSite = true
@@ -33,9 +34,13 @@ function Index() {
       </header>
 
       <div className="section story">
-        <h2>Our Story</h2>
-        <p>Content to be added later</p>
-        {showMintingSite && <Link to="Mint">Mint Some AiCoco!</Link>}
+        { showMintingSite && 
+        <>
+          <h2><Link to="Mint">NEW! BURN COCO to Mint AiCOCO</Link></h2>
+          <Link to="Mint"><img src={fire256} alt="x" /></Link><br />
+          <Link to="Mint">Enter Minting Site</Link><br />
+        </>
+        }
       </div>
 
       <div className="section community">
