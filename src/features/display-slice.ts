@@ -3,11 +3,15 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 interface DisplayState {
   error: boolean
   errorMessage: string
+  message: boolean
+  messageText: string
 }
 
 const initialState: DisplayState = {
   error: false,
-  errorMessage: null
+  errorMessage: null,
+  message: false,
+  messageText: null
 }
 
 const displaySlice = createSlice({
@@ -21,9 +25,17 @@ const displaySlice = createSlice({
     clearError(state, args) {
       state.error = false
       state.errorMessage = null
+    },
+    causeMessage(state, args) {
+      state.message = true
+      state.messageText = args.payload
+    },
+    clearMessage(state, args) {
+      state.message = false
+      state.messageText = ''
     }
   }
 })
 
-export const { causeError, clearError } = displaySlice.actions
+export const { causeError, clearError, causeMessage, clearMessage } = displaySlice.actions
 export default displaySlice.reducer

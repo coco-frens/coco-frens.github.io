@@ -1,3 +1,9 @@
+@font-face {
+  font-family: 'Bungee-Regular'; 
+  src: local('Bungee-Regular'), url('./fonts/Bungee-Regular.woff') format('woff')
+}
+
+
 :root {
   background-image: url('assets/coco.jpeg');
   background-repeat: repeat;
@@ -58,7 +64,7 @@ nav a {
 
 
 .story {
-  background-color: #505050;
+  background-color: #6d6c50;
 }
 
 .community {
@@ -102,4 +108,26 @@ footer {
   color: #fff;
   width: 100%;
   border-radius: 20px;
+}
+
+.btn {
+  font-family: "Bungee-Regular";
+  font-size: 1em;
+    background: #fff;
+    background-color: #6d6c50;
+    color: black;
+    border: 2px solid red;
+    border-radius: 10px;
+    padding: 5px 10px;
+    text-transform: uppercase;
+    width: 50%;
+}
+
+.btn:hover {
+  background: #fff;
+  background-color: #fff;
+}
+
+.smallTxt {
+  font-size: 0.75em;
 }

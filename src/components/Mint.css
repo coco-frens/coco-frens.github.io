@@ -14,3 +14,20 @@
   background-color: #6d6c50;
   float: left;
 }
+
+.burnHeader {
+  font-family: "Bungee-Regular";
+}
+
+.burnHeaderInline {
+  font-family: "Bungee-Regular";
+  display: inline;
+}
+
+.formBorder {
+  width: 60%;
+  border-radius: 20px;
+  border: 2px solid red;
+  margin-right: 20%;
+  margin-left: 20%;
+}

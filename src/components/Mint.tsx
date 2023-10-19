@@ -3,7 +3,6 @@ import { useAppDispatch, useAppSelector } from '../app/hooks'
 
 import { updateCalc } from '../features/math/math-slice.ts'
 import { setContractData, initedState } from '../features/web3/web3-slice.ts'
-
 import { 
   useAccount, 
   useConnect, 
@@ -11,10 +10,12 @@ import {
   useEnsName, 
   useNetwork 
 } from 'wagmi'
-
+import { Link } from 'react-router-dom'
+import { Tooltip } from 'react-tooltip'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { Form, Field } from 'react-final-form'
 import MintControls from './MintControls.tsx'
+import Message from './Message.tsx'
 
 import Decimals from '../utils/Decimals.js'
 const decimals = new Decimals()
@@ -25,6 +26,7 @@ import './Mint.css'
 let aiCocoContractAddress
 let cocoContractAddress
 let ready
+let etherscanUrl
 
 function Mint() {
 
@@ -58,6 +60,10 @@ function Mint() {
   })
 
   const { chain } = useNetwork()
+  if (chain) {
+    etherscanUrl = 'https://' + chain.network + '.etherscan.io/address/' + aiCocoContractAddress + '#code'
+  }
+
   const dispatch = useAppDispatch()
 
   let ready, totalBurned
@@ -66,31 +72,56 @@ function Mint() {
     totalBurned = state.web3.totalBurned
   })
   
+  const message = useAppSelector((state) => state.display.message)
+
   let error
   if (connectionError) {
     if (connectionError.details) error = connectionError.details
     else if (connectionError.message) error = connectionError.message + '. Get Metamask!'
   }
 
+
   return (
     <div className="container">
       <div className="mintSection mint">
-        <h2>Ai Coco - Burn coco to mint tokens...</h2>
+        <h2 className="burnHeader">Ai Coco</h2><h2 className="burnHeader">Burn coco to mint tokens</h2>
         {totalBurned > 0 && <>AiCoco NFT has burned {com(d(totalBurned, 18))} COCO!</>}
       </div>
       <div className="mintSection mint">
         <>
-          {isConnected && <div>Your account: {ensName ?? address}</div>}
-          {!isConnected && <button onClick={() => connect()}>Connect Wallet</button>}
-          {error && <><br />Error: { error }</>}
+          {isConnected && <div className="smallTxt">Your account: {ensName ?? address}</div>}
+          {!isConnected &&
+            <>
+            <Tooltip id="connect-tip" />
+            <button 
+              className="btn" 
+              onClick={() => connect()} 
+              data-tooltip-id="connect-tip"  
+              data-tooltip-content="Get Started by connecting your wallet..."
+              data-tooltip-place="top"
+            >Connect Wallet</button>
+            </>
+          }
+          {error && <><br />Error: {error}</>}
+          {isConnected && <div className="smallTxt">Connected via: {connector.name} {chain.name}</div>}
           <br />
-          {isConnected && <>Connected via: {connector.name} {chain.name}</>}
-          <br /><br />
           {isConnected && <MintControls />}
         </>
       </div>
+      {isConnected &&
+        <div className="mintSection mint">
+          <a href={etherscanUrl} target="_blank">View the token contract</a><br />
+          <div className="smallTxt">to view testnet on opensea:<br />
+            connect to appropriate network (sepolia) with metamask and try this link:<br />
+            <a href="https://testnets.opensea.io/collection/aicoco-2" target="_blank">https://testnets.opensea.io/collection/aicoco-2</a><br />
+          </div>
+          <Link to="/">Home</Link> | Mint |  <Link to="/Sets">Sets</Link>
+        </div>
+      }
     </div>
+
   )
+  
 }
 
 export default Mint

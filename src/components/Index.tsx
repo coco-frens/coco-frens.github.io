@@ -22,12 +22,11 @@ function Index() {
             <li><a href="#home">Home</a></li>
             <li><a href="#story">Story</a></li>
             <li><a href="#community">Community</a></li>
-            <li><a href="#contact">Contact</a></li>
           </ul>
         </nav>
 
         <div>
-          <h1>Welcome to COCO</h1>
+          <h1 className="burnHeader">Welcome to COCO</h1>
           <p>The ultimate meme token on ETH</p>
           <p>0xE6DBeAdD1823B0BCfEB27792500b71e510AF55B3</p>
         </div>
@@ -35,22 +34,22 @@ function Index() {
 
       <div className="section story">
         { showMintingSite && 
-        <>
-          <h2><Link to="Mint">NEW! BURN COCO to Mint AiCOCO</Link></h2>
+        <div className="burnHeader">
+          <h2 className="burnHeader"><Link to="Mint">NEW! BURN COCO to Mint AiCOCO</Link></h2>
           <Link to="Mint"><img src={fire256} alt="x" /></Link><br />
-          <Link to="Mint">Enter Minting Site</Link><br />
-        </>
+          <Link to="Mint">Enter Minting Site</Link> | <Link to="/Sets">Sets</Link><br />
+        </div>
         }
       </div>
 
       <div className="section community">
-        <h2>Community</h2>
+        <h2 className="burnHeader">Community</h2>
         <p>COCO is a meme coin like no other, embodying the iconic Pepe meme style and offering a unique, organic meme experience. Its limitless creative potential, from the lovable crocodile theme to playful variants like "In love with the coco," ensures a constant stream of engaging content, strong community support.</p>
       </div>
 
       <div className="section social">
         <div id="social-links">
-          <h2>Follow Us</h2>
+          <h2 className="burnHeader">Follow Us</h2>
           <ul>
             <li><a href="https://twitter.com/thecocoethtoken" target="_blank"><img src={xLogo} alt="x" /></a></li>
             <li><a href="https://www.dextools.io/app/en/ether/pair-explorer/0xeae4c727ea43990ea92f427da36ddff8e72f6854" target="_blank"><img src={dextoolsLogo} alt="Dextools" /></a></li>
@@ -63,10 +62,10 @@ function Index() {
       </div>
 
       <div className="section supporters">
-        <h2>Community Supporters</h2>
-        thanks to kenyruyter@gmail.com for managing the dextools update!<br />
-        thanks to BitcoinJake for inspiring the website<br />
-        thanks to Godder for rebooting the telegrams and facebooks<br />
+        <h2 className="burnHeader">Community Supporters</h2>
+        thanks to <div className="burnHeaderInline">kenyruyter</div> at gmail.com for dev-ing the NFT<br />
+        thanks to <div className="burnHeaderInline">BitcoinJake</div> for inspiring the website<br />
+        thanks to <div className="burnHeaderInline">Godder</div> for rebooting the telegrams and facebooks<br />
       </div>
 
       <footer className="footer" >

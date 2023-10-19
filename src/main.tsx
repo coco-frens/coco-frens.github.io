@@ -6,6 +6,8 @@ import { Provider } from 'react-redux'
 import { store } from './app/store'
 import './index.css'
 
+import 'react-tooltip/dist/react-tooltip.css'
+
 import { WagmiConfig, createConfig, configureChains, mainnet, sepolia } from 'wagmi'
 import { goerli } from 'wagmi/chains'
 import { publicProvider } from 'wagmi/providers/public'

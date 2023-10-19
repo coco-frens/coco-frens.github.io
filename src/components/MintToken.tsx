@@ -1,9 +1,12 @@
 import { useEffect } from 'react'
+
 import {
   usePrepareContractWrite,
   useContractWrite,
   useWaitForTransaction
 } from 'wagmi'
+import { Tooltip } from 'react-tooltip'
+
 import { useAppDispatch, useAppSelector } from '../app/hooks'
 import aiCocoAbi from '../utils/aiCocoAbi.json'
 import { getNewContractData } from '../features/web3/web3-slice.ts'
@@ -27,13 +30,18 @@ function MintToken() {
     address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'publicMintMulti', args: [numOfTokens]
   })
 
-  const { data, isLoading, isSuccess, isError, error, write } = useContractWrite(config)
+  const { data, isLoading, isSuccess, isError, error, write, reset } = useContractWrite(config)
 
   const hash = data?.hash
 
   const { data: broadcastData, isSuccess: isBroadcasted, isError: broadcastError, isLoading: broadcastLoading } = useWaitForTransaction({
     hash: hash,
   })
+
+  const clearErrorMsg = () => {
+    reset()
+    console.log('clearError Msg')
+  }
 
   const clicked = () => {
     console.log('Minting...')
@@ -51,19 +59,29 @@ function MintToken() {
     }
   })
 
-  return (
-    <div>
-      <button
-        disabled={!write}
-        onClick={() => { write?.(); clicked() } }
-      >
-        Mint AiCoco
-      </button>
-      {isLoading && <div>Check Wallet...</div>}
-      {isSuccess && <div>Transaction: {JSON.stringify(data)}</div>}
-      {isError && <div>Error: {error.details}</div>}
-    </div>
-  )
+  if (isError) {
+    // In this case we want the button to dissappear and let the error be seen, then auto reset after a few seconds
+    setTimeout(clearErrorMsg, 3000)
+    return (<div>Error: {error.details}</div>)
+  } else {
+    return (
+      <div>
+        <Tooltip id="mint-tip" />
+        <button
+          className="btn"
+          data-tooltip-id="mint-tip"
+          data-tooltip-content="App is ready to Mint AiCoco. Make sure you confirm in MetaMask!"
+          data-tooltip-place="top"
+          disabled={!write}
+          onClick={() => { clicked(); write?.(); }}
+        >Mint AiCoco
+        </button>
+        {isLoading && <div>Check Wallet...</div>}
+        {isSuccess && <div>Transaction: {hash}</div>}
+        {isError && <div>Error: {error.details}</div>}
+      </div>
+    )
+  }
 }
 
 export default MintToken

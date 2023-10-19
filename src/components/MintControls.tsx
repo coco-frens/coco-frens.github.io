@@ -4,11 +4,12 @@ import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { Form, Field } from 'react-final-form'
 import Decimals from '../utils/Decimals.js'
 const decimals = new Decimals()
-const { d, com } = decimals
+const { d, com, gte, lte } = decimals
 
 import { updateCalc } from '../features/math/math-slice.ts'
 import { readyState, notReady } from '../features/web3/web3-slice.ts'
 import { causeError, clearError } from '../features/display-slice.ts'
+import { Tooltip } from 'react-tooltip'
 
 import MintApprove from './MintApprove.tsx'
 import MintToken from './MintToken.tsx'
@@ -122,6 +123,11 @@ function MintControls() {
     }
   })
 
+  const doTheMath = (a, b) => {
+    console.log(a, b)
+    return lte(a, b)
+  }
+  
   if (isFetching) {
     dispatch(notReady())
   }
@@ -146,49 +152,61 @@ function MintControls() {
                 {mintOpen && nftsAvailable > 0 &&
                   <>
 
-                    There are currently {nftsAvailable} AiCoco NFT's available for minting.<br />
-                    The cost for each NFT is {com(d(price, 18))} Coco<br /><br />
-                    <b>All proceeds are immediately sent to the burn address.</b>
+                    NFT's available right now: {nftsAvailable} <br />
+                    Cost: {com(d(price, 18))} Coco<br /><br />
+                    <b className="burnHeader">All proceeds are immediately burned.</b>
                     <br /><br />
 
-                    Your COCO Balance: {com(d(userBalance, 18))}<br />
-                    {walletOfOwner > 0 && <>You own {walletOfOwner} AiCoco NFT's<br /></>}
-                    Mint How many NFTs?<br /><br />
+                <div className="smallTxt">Your COCO Balance: {com(d(userBalance, 18))}</div>
+                {walletOfOwner > 0 && <div className="smallTxt">You own {walletOfOwner} AiCoco NFT's<br /></div>}
+                <br />
 
-                    <div>
+                    <Tooltip id="buttons-tip" />
+                    <div
+                     data-tooltip-id="buttons-tip"
+                     data-tooltip-content="Select a number of tokens to mint..."
+                     data-tooltip-place="top"
+                    //  className="formBorder"
+                    >
+                  Select How many NFTs?<br /><br />
                       {nftsAvailable >= 1 && <><input type="radio" value="1" name="numOfTokens" onClick={() => setTokens(1, price)} /> 1<br /></>}
                       {nftsAvailable >= 2 && <><input type="radio" value="2" name="numOfTokens" onClick={() => setTokens(2, price)} /> 2<br /></>}
                       {nftsAvailable >= 3 && <><input type="radio" value="3" name="numOfTokens" onClick={() => setTokens(3, price)} /> 3<br /></>}
                       {nftsAvailable >= 4 && <><input type="radio" value="4" name="numOfTokens" onClick={() => setTokens(4, price)} /> 4<br /></>}
                       {nftsAvailable >= 5 && <><input type="radio" value="5" name="numOfTokens" onClick={() => setTokens(5, price)} /> 5<br /></>}
                     </div>
+                <br />
 
                     Total COCO to burn: {com(d(totalCoco, 18))}<br /><br />
+                    {numOfTokens === 0 && <div>Select Number of tokens to Approve</div>}
                   </>
 
                 }
 
-                {mintOpen && numOfTokens > 0 && nftsAvailable > 0 &&
-                  <>
-                    Step 1 of 2: <br />
-                    {aiCocoAllowance >= totalCoco &&
-                      <>
-                        {/* Current contract Allowance: {com(d(aiCocoAllowance, 18))}<br /> */}
-                        complete: OK to mint {numOfTokens} NFT {numOfTokens > 1 && <>'s!</>}
-                        <br /><br />
-                      </>}
-                    {aiCocoAllowance < totalCoco && <>Approve AiCoco Contract to spend {com(d(totalCoco, 18))}<br /></>}
-                    {aiCocoAllowance < totalCoco && <MintApprove />}
-                  </>}
-                {/* <MintApprove /> */}
+              { mintOpen && numOfTokens > 0 && nftsAvailable > 0 &&
+                <>
+                  Step 1 of 2: <br />
+                {gte(aiCocoAllowance, totalCoco) && 
+                    <>
+                      Current contract Allowance: {com(d(aiCocoAllowance, 18))}<br />
+                      <div className="burnHeader">OK to mint {numOfTokens} NFT {numOfTokens > 1 && <>'s!</>}</div>
+                      <br /><br />
+                    </>
+                  }
+                  {lte(aiCocoAllowance, totalCoco) && <>Approve AiCoco Contract to spend {com(d(totalCoco, 18))}<br /></>}
+                  {lte(aiCocoAllowance, totalCoco) && <MintApprove />}
+                </>
+              }
 
-                {mintOpen && (wasApproved || aiCocoAllowance >= totalCoco) && numOfTokens > 0 &&
-                  <>
-                    Step 2 of 2:  <br />
-                    Mint {numOfTokens} AiCoCo<br /><br />
-                    <MintToken />
-                  </>}
-
+              {mintOpen && (wasApproved || gte(aiCocoAllowance, totalCoco)) && numOfTokens > 0 && gte(userBalance, totalCoco) &&
+                <div>
+                  Step 2 of 2:  <br />
+                  <div className="burnHeader">Mint {numOfTokens} AiCoCo</div><br /><br />
+                  <MintToken />
+                </div>
+              }
+              
+              {!gte(userBalance, totalCoco) && <> Cannot mint: User Balance not sufficient to mint tokens</>}
 
               </>
             }

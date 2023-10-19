@@ -1,6 +1,22 @@
-import * as bigDecimal from 'js-big-decimal'
+import bigDecimal from 'js-big-decimal'
 
 class Decimals {
+
+  gte(a, b) {
+    var n1 = new bigDecimal(String(a))
+    var n2 = new bigDecimal(String(b))
+    const evaluate = n1.compareTo(n2)
+    if (evaluate > 0 || evaluate === 0) return true
+    return false
+  }
+
+  lte(a, b) {
+    var n1 = new bigDecimal(String(a))
+    var n2 = new bigDecimal(String(b))
+    const evaluate = n1.compareTo(n2)
+    if (evaluate < 0) return true
+    return false
+  }
 
   // both need to be strings
   multBigN(a, b){
