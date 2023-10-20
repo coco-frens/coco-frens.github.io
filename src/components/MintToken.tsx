@@ -77,7 +77,7 @@ function MintToken() {
         >Mint AiCoco
         </button>
         {isLoading && <div>Check Wallet...</div>}
-        {isSuccess && <div>Transaction: {hash}</div>}
+        {isSuccess && <div className="smallTxt">Transaction: {hash}</div>}
         {isError && <div>Error: {error.details}</div>}
       </div>
     )

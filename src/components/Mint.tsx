@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../app/hooks'
-
 import { updateCalc } from '../features/math/math-slice.ts'
 import { setContractData, initedState } from '../features/web3/web3-slice.ts'
 import { 
@@ -12,10 +11,14 @@ import {
 } from 'wagmi'
 import { Link } from 'react-router-dom'
 import { Tooltip } from 'react-tooltip'
-import { InjectedConnector } from 'wagmi/connectors/injected'
+// import { InjectedConnector } from 'wagmi/connectors/injected'
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
+
 import { Form, Field } from 'react-final-form'
 import MintControls from './MintControls.tsx'
 import Message from './Message.tsx'
+
+import gm from '../assets/gm512.png'
 
 import Decimals from '../utils/Decimals.js'
 const decimals = new Decimals()
@@ -33,7 +36,7 @@ function Mint() {
   const { address, isConnected, connector } = useAccount()
   const { data: ensName } = useEnsName({ address })
   const { connect, connectors, error: connectionError } = useConnect({
-    connector: new InjectedConnector(),
+    connector: new MetaMaskConnector(),
     onSuccess(connectionData){
 
       switch (chain.id) {
@@ -84,7 +87,8 @@ function Mint() {
   return (
     <div className="container">
       <div className="mintSection mint">
-        <h2 className="burnHeader">Ai Coco</h2><h2 className="burnHeader">Burn coco to mint tokens</h2>
+        <img className="headerImg"  src={gm}/>
+        <h2 className="burnHeader">Burn coco to mint AiCoco tokens</h2>
         {totalBurned > 0 && <>AiCoco NFT has burned {com(d(totalBurned, 18))} COCO!</>}
       </div>
       <div className="mintSection mint">
@@ -92,6 +96,7 @@ function Mint() {
           {isConnected && <div className="smallTxt">Your account: {ensName ?? address}</div>}
           {!isConnected &&
             <>
+            <div className="smallTxt">Connect with MetaMask. Other wallets not tested.</div>
             <Tooltip id="connect-tip" />
             <button 
               className="btn" 

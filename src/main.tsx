@@ -4,7 +4,6 @@ import App from './App.tsx'
 
 import { Provider } from 'react-redux'
 import { store } from './app/store'
-import './index.css'
 
 import 'react-tooltip/dist/react-tooltip.css'
 

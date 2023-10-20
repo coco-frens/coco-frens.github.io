@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { Form, Field } from 'react-final-form'
 import Decimals from '../utils/Decimals.js'
 const decimals = new Decimals()
-const { d, com, gte, lte } = decimals
+const { d, com, gte, lte, divide } = decimals
 
 import { updateCalc } from '../features/math/math-slice.ts'
 import { readyState, notReady } from '../features/web3/web3-slice.ts'
@@ -120,14 +120,19 @@ function MintControls() {
     if (doRefetch) {
       console.log('doRefetch')
       refetch()
+      if (aiCocoAllowance > 0 && price > 0) {
+        let tokens = divide(aiCocoAllowance, price)
+        tokens = Math.trunc(tokens)
+        if (tokens > 5) tokens = 5
+        setTokens(tokens, price)
+        // document.getElementById("r" + tokens).checked = true
+      }
+
     }
   })
 
-  const doTheMath = (a, b) => {
-    console.log(a, b)
-    return lte(a, b)
-  }
-  
+
+
   if (isFetching) {
     dispatch(notReady())
   }
@@ -169,11 +174,11 @@ function MintControls() {
                     //  className="formBorder"
                     >
                   Select How many NFTs?<br /><br />
-                      {nftsAvailable >= 1 && <><input type="radio" value="1" name="numOfTokens" onClick={() => setTokens(1, price)} /> 1<br /></>}
-                      {nftsAvailable >= 2 && <><input type="radio" value="2" name="numOfTokens" onClick={() => setTokens(2, price)} /> 2<br /></>}
-                      {nftsAvailable >= 3 && <><input type="radio" value="3" name="numOfTokens" onClick={() => setTokens(3, price)} /> 3<br /></>}
-                      {nftsAvailable >= 4 && <><input type="radio" value="4" name="numOfTokens" onClick={() => setTokens(4, price)} /> 4<br /></>}
-                      {nftsAvailable >= 5 && <><input type="radio" value="5" name="numOfTokens" onClick={() => setTokens(5, price)} /> 5<br /></>}
+                      {nftsAvailable >= 1 && <><input id="r1" type="radio" value="1" name="numOfTokens" onClick={() => setTokens(1, price)} /> 1<br /></>}
+                      {nftsAvailable >= 2 && <><input id="r2" type="radio" value="2" name="numOfTokens" onClick={() => setTokens(2, price)} /> 2<br /></>}
+                      {nftsAvailable >= 3 && <><input id="r3" type="radio" value="3" name="numOfTokens" onClick={() => setTokens(3, price)} /> 3<br /></>}
+                      {nftsAvailable >= 4 && <><input id="r4" type="radio" value="4" name="numOfTokens" onClick={() => setTokens(4, price)} /> 4<br /></>}
+                      {nftsAvailable >= 5 && <><input id="r5" type="radio" value="5" name="numOfTokens" onClick={() => setTokens(5, price)} /> 5<br /></>}
                     </div>
                 <br />
 
@@ -186,15 +191,19 @@ function MintControls() {
               { mintOpen && numOfTokens > 0 && nftsAvailable > 0 &&
                 <>
                   Step 1 of 2: <br />
-                {gte(aiCocoAllowance, totalCoco) && 
+                   {gte(aiCocoAllowance, totalCoco) && gte(userBalance, totalCoco) &&
                     <>
                       Current contract Allowance: {com(d(aiCocoAllowance, 18))}<br />
                       <div className="burnHeader">OK to mint {numOfTokens} NFT {numOfTokens > 1 && <>'s!</>}</div>
                       <br /><br />
                     </>
                   }
-                  {lte(aiCocoAllowance, totalCoco) && <>Approve AiCoco Contract to spend {com(d(totalCoco, 18))}<br /></>}
-                  {lte(aiCocoAllowance, totalCoco) && <MintApprove />}
+                {gte(userBalance, totalCoco) && lte(aiCocoAllowance, totalCoco) &&
+                  <>
+                  Approve AiCoco Contract to spend {com(d(totalCoco, 18))}<br />
+                  <MintApprove />
+                  </>
+                }
                 </>
               }
 
