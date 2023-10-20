@@ -80,7 +80,6 @@ function Mint() {
     else if (connectionError.message) error = connectionError.message + '. Get Metamask!'
   }
 
-
   return (
     <div className="container">
       <div className="mintSection mint">
