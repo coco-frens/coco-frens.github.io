@@ -38,8 +38,11 @@ function Mint() {
   const { connect, connectors, error: connectionError } = useConnect({
     connector: new MetaMaskConnector(),
     onSuccess(connectionData){
-
       switch (chain.id) {
+        case 1: // mainnet
+          aiCocoContractAddress = '0x2c64a8d8462960a687E586F2b3303774390948Cb'
+          cocoContractAddress = '0xE6DBeAdD1823B0BCfEB27792500b71e510AF55B3'
+          break
         case 5: // Goerli
           aiCocoContractAddress = '0x87c87C7B624027d82D8c177054D5FcBcAC1bA3A6'
           cocoContractAddress =  '0xf05b8B90D99B7eDacC270d8A7db6C36F1DD63f72'
@@ -47,10 +50,6 @@ function Mint() {
         case 11155111: // sepolia
           aiCocoContractAddress = '0x990DB6C221C01e7E1192652c71c3846665E21441'
           cocoContractAddress = '0xfe9ea3a9f788aa97faba8c4fa280d9f36373f253'
-          break
-        case 1: // mainnet
-          aiCocoContractAddress = 'somewhereonmainnet'
-          cocoContractAddress = '0xE6DBeAdD1823B0BCfEB27792500b71e510AF55B3'
           break
       }
       const readyData = {
@@ -64,17 +63,15 @@ function Mint() {
 
   const { chain } = useNetwork()
   if (chain) {
-    etherscanUrl = 'https://' + chain.network + '.etherscan.io/address/' + aiCocoContractAddress + '#code'
+    let n = chain.network + '.'
+    if (chain.network == 'homestead') n = ''
+    etherscanUrl = 'https://' + n + 'etherscan.io/address/' + aiCocoContractAddress + '#code'
   }
 
   const dispatch = useAppDispatch()
 
-  let ready, totalBurned
-  useAppSelector((state) => {
-    ready = state.web3.ready
-    totalBurned = state.web3.totalBurned
-  })
-  
+  const { totalBurned } = useAppSelector((state) => state.web3.totalBurned)
+
   const message = useAppSelector((state) => state.display.message)
 
   let error
@@ -116,10 +113,7 @@ function Mint() {
       {isConnected &&
         <div className="mintSection mint">
           <a href={etherscanUrl} target="_blank">View the token contract</a><br />
-          <div className="smallTxt">to view testnet on opensea:<br />
-            connect to appropriate network (sepolia) with metamask and try this link:<br />
-            <a href="https://testnets.opensea.io/collection/aicoco-2" target="_blank">https://testnets.opensea.io/collection/aicoco-2</a><br />
-          </div>
+          <a href="https://opensea.io/collection/aicoco?" target="_blank">https://opensea.io/collection/aicoco?</a><br />
           <Link to="/">Home</Link> | Mint |  <Link to="/Sets">Sets</Link>
         </div>
       }

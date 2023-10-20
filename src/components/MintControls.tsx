@@ -25,39 +25,27 @@ import {
 import cocoAbi from '../utils/cocoAbi.json'
 import aiCocoAbi from '../utils/aiCocoAbi.json'
 
-let aiCocoContractConfig
-let aiCocoContractAddress
-let cocoContractConfig
-let cocoContractAddress
-let contractData
-
 function MintControls() {
 
-  const { chain } = useNetwork()
   const dispatch = useAppDispatch()
-
-  let address
-  let ready = false
-
   const setTokens = (_numOfTokens) => {
     dispatch(updateCalc({ numOfTokens: _numOfTokens, price: price }))
   }
 
-  useAppSelector((state) => {
-    address = state.web3.address
-    aiCocoContractAddress = state.web3.aiCocoContractAddress
-    cocoContractAddress = state.web3.cocoContractAddress
-  })
+  const { address, aiCocoContractAddress, cocoContractAddress } = useAppSelector((state) => ({
+    address: state.web3.address,
+    aiCocoContractAddress: state.web3.aiCocoContractAddress,
+    cocoContractAddress: state.web3.cocoContractAddress
+  }))
 
-  let numOfTokens, totalCoco, wasApproved, doRefetch, error, errorMessage
-  useAppSelector((state) => numOfTokens = state.math.numOfTokens)
-  useAppSelector((state) => totalCoco = state.math.totalCoco)
-  useAppSelector((state) => wasApproved = state.web3.wasApproved)
-  useAppSelector((state) => doRefetch = state.web3.doRefetch)
-  useAppSelector((state) => { 
-    error = state.display.error
-    errorMessage = state.display.errorMessage
-  })
+  const numOfTokens = useAppSelector((state) => state.math.numOfTokens)
+  const totalCoco = useAppSelector((state) => state.math.totalCoco)
+  const wasApproved = useAppSelector((state) => state.web3.wasApproved)
+  const doRefetch = useAppSelector((state) => state.web3.doRefetch)
+  const { error, errorMessage } = useAppSelector((state) => ({ 
+    error: state.display.error,
+    errorMessage: state.display.errorMessage
+  }))
 
   // So basically this hook calls the contracts readonly stuff, but we cant use the variables 
   // because the onSuccess callback appears to be out of scope.
@@ -75,7 +63,7 @@ function MintControls() {
     return map
   }
 
-  const { isFetching, refetch } = useContractReads({
+  const { refetch } = useContractReads({
     contracts: [
       { address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'totalBurned' },
       { address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'pricePerNft' },
@@ -101,24 +89,25 @@ function MintControls() {
     },
     onError(error) {
       console.log('error, reads', error)
-    }
+    },
+    
   })
-  let totalBurned, price, mintOpen, userBalance, aiCocoAllowance, cidLength, tokenCounter, walletOfOwner
-  useAppSelector((state) => {
-    ready = state.web3.ready
-    totalBurned = state.web3.totalBurned
-    price = state.web3.price
-    mintOpen = state.web3.mintOpen
-    userBalance = state.web3.userBalance
-    aiCocoAllowance = state.web3.aiCocoAllowance
-    cidLength = state.web3.cidLength
-    tokenCounter = state.web3.tokenCounter
-    walletOfOwner = state.web3.walletOfOwner
-  })
+
+  const ready = useAppSelector((state) => state.web3.ready)
+
+  const { totalBurned, price, mintOpen, userBalance, aiCocoAllowance, cidLength, tokenCounter, walletOfOwner } = useAppSelector((state) => ({
+    totalBurned: state.web3.totalBurned,
+    price: state.web3.price,
+    mintOpen: state.web3.mintOpen,
+    userBalance: state.web3.userBalance,
+    aiCocoAllowance: state.web3.aiCocoAllowance,
+    cidLength: state.web3.cidLength,
+    tokenCounter: state.web3.tokenCounter,
+    walletOfOwner: state.web3.walletOfOwner
+  }))
 
   useEffect(() => {
     if (doRefetch) {
-      console.log('doRefetch')
       refetch()
       if (aiCocoAllowance > 0 && price > 0) {
         let tokens = divide(aiCocoAllowance, price)
@@ -127,18 +116,10 @@ function MintControls() {
         setTokens(tokens, price)
         // document.getElementById("r" + tokens).checked = true
       }
-
     }
   })
 
-
-
-  if (isFetching) {
-    dispatch(notReady())
-  }
-
   const nftsAvailable = cidLength - tokenCounter
-
   if (error) {
     console.log('error: ' + errorMessage)
     return (<div>
@@ -149,12 +130,12 @@ function MintControls() {
       <div>
         <div>
           <>
-            {!ready && <> spinner <br />loading contract data<br /></>}
-            {ready &&
+            {!ready && <><br />loading contract data...<br /></>}
+            {ready == true &&
               <>
-                {!mintOpen && <>Minting is currently not available.</>}
+              {mintOpen == false && <>Minting is currently not available.</>}
                 {nftsAvailable === 0 && <>Sorry there are no NFT's available to mint at this time...</>}
-                {mintOpen && nftsAvailable > 0 &&
+                {mintOpen == true && nftsAvailable > 0 &&
                   <>
 
                     NFT's available right now: {nftsAvailable} <br />
@@ -188,7 +169,7 @@ function MintControls() {
 
                 }
 
-              { mintOpen && numOfTokens > 0 && nftsAvailable > 0 &&
+              {mintOpen == true && numOfTokens > 0 && nftsAvailable > 0 &&
                 <>
                   Step 1 of 2: <br />
                    {gte(aiCocoAllowance, totalCoco) && gte(userBalance, totalCoco) &&
@@ -207,7 +188,7 @@ function MintControls() {
                 </>
               }
 
-              {mintOpen && (wasApproved || gte(aiCocoAllowance, totalCoco)) && numOfTokens > 0 && gte(userBalance, totalCoco) &&
+              {mintOpen == true && (wasApproved || gte(aiCocoAllowance, totalCoco)) && numOfTokens > 0 && gte(userBalance, totalCoco) &&
                 <div>
                   Step 2 of 2:  <br />
                   <div className="burnHeader">Mint {numOfTokens} AiCoCo</div><br /><br />

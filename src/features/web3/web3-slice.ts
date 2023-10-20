@@ -44,7 +44,7 @@ const web3Slice = createSlice({
     readyState(state, args) {
       state.totalBurned = String(args.payload[0])
       state.price = String(args.payload[1])
-      state.mintOpen = args.payload[2]
+      state.mintOpen = args.payload[2] === 'true' ? true : false
       state.userBalance = String(args.payload[3])
       state.aiCocoAllowance = String(args.payload[4])
       state.cidLength = args.payload[5]
