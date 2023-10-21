@@ -2,10 +2,18 @@ import bigDecimal from 'js-big-decimal'
 
 class Decimals {
 
+  gt(a, b) {
+    const n1 = new bigDecimal(String(a))
+    const n2 = new bigDecimal(String(b))
+    const evaluate = n1.compareTo(n2).value
+    if (evaluate > 0) return true
+    return false
+  }
+  
   divide(a, b) {
     const n1 = new bigDecimal(String(a))
     const n2 = new bigDecimal(String(b))
-    return n1.divide(n2).value
+    return n1.divide(n2).value // String
   }
 
   gte(a, b) {

@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createSelector } from 'reselect'
 import {
   usePrepareContractWrite,
   useContractWrite,
@@ -9,9 +10,12 @@ import cocoAbi from '../utils/cocoAbi.json'
 import { Tooltip } from 'react-tooltip'
 import { getNewContractData } from '../features/web3/web3-slice.ts'
 
-let cocoContractConfig
-let cocoContractAddress
-let aiCocoContractAddress
+
+const selectAddressInfo = (state:any) => ({
+  aiCocoContractAddress: state.web3.aiCocoContractAddress,
+  cocoContractAddress: state.web3.cocoContractAddress
+})
+const memoizedAddressInfo = createSelector([selectAddressInfo], _ => _)
 
 let once = 0
 
@@ -19,13 +23,7 @@ function MintApprove() {
 
   const dispatch = useAppDispatch()
 
-  let address
-
-  useAppSelector((state) => {
-    address = state.web3.address
-    cocoContractAddress = state.web3.cocoContractAddress
-    aiCocoContractAddress = state.web3.aiCocoContractAddress
-  })
+  const { cocoContractAddress, aiCocoContractAddress } = useAppSelector(memoizedAddressInfo)
 
   const totalCoco = useAppSelector((state) => state.math.totalCoco)
 
@@ -37,7 +35,7 @@ function MintApprove() {
 
   const hash = data?.hash
 
-  const { data:broadcastData, isSuccess: isBroadcasted, isError: broadcastError, isLoading: broadcastLoading } = useWaitForTransaction({
+  const { isFetching: txData, isSuccess: isBroadcasted  } = useWaitForTransaction({
     hash: hash,
   })
 
@@ -50,6 +48,7 @@ function MintApprove() {
     if (isBroadcasted) {
       if (once === 0) {
         console.log('Approval Success!')
+
         dispatch(getNewContractData())
         once += 1
       }
@@ -57,10 +56,18 @@ function MintApprove() {
   })
 
 
-  if (isError) {
+  if (isError && error) {
+    const errorString = error.message
     // In this case we want the button to dissappear and let the error be seen, then auto reset after a few seconds
     setTimeout(clearErrorMsg, 3000)
-    return ( <div>Error: {error.details}</div> )
+    return (<div>Error: {errorString}</div> )
+  } else if (isLoading || txData) {
+    return (
+      <div>
+        <button disabled={true} className="btn-disabled" >Approving</button>
+        {isSuccess && <div className="smallTxt">Transaction: {hash}</div>}
+      </div>
+    )
   } else {
     return (
       <div>
@@ -75,7 +82,6 @@ function MintApprove() {
         >Approve</button><br />
         {isLoading && <div>Check Wallet...</div>}
         {isSuccess && <div className="smallTxt">Transaction: {hash}</div>}
-        {isError && <div>Error: {error.details}</div>}
       </div>
     )
   }

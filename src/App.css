@@ -128,6 +128,19 @@ footer {
   background-color: #fff;
 }
 
+.btn-disabled {
+  font-family: "Bungee-Regular";
+    font-size: 1em;
+    background: #fff;
+    background-color: #6d6c50;
+    color: gray;
+    border: 2px solid gray;
+    border-radius: 10px;
+    padding: 5px 10px;
+    text-transform: uppercase;
+    width: 50%;
+}
+
 .smallTxt {
   font-size: 0.75em;
 }

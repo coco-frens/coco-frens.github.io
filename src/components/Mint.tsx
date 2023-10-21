@@ -1,11 +1,8 @@
-import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../app/hooks'
-import { updateCalc } from '../features/math/math-slice.ts'
-import { setContractData, initedState } from '../features/web3/web3-slice.ts'
+import { initedState } from '../features/web3/web3-slice.ts'
 import { 
   useAccount, 
   useConnect, 
-  useContractReads, 
   useEnsName, 
   useNetwork 
 } from 'wagmi'
@@ -14,30 +11,29 @@ import { Tooltip } from 'react-tooltip'
 // import { InjectedConnector } from 'wagmi/connectors/injected'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 
-import { Form, Field } from 'react-final-form'
 import MintControls from './MintControls.tsx'
-import Message from './Message.tsx'
 
 import gm from '../assets/gm512.png'
 
 import Decimals from '../utils/Decimals.js'
 const decimals = new Decimals()
-const { com, d, numberWithCommas } = decimals
+const { com, d } = decimals
 
 import './Mint.css'
 
-let aiCocoContractAddress
-let cocoContractAddress
-let ready
-let etherscanUrl
+let aiCocoContractAddress: `0x${string}`
+let cocoContractAddress: `0x${string}`
+let etherscanUrl: string
 
 function Mint() {
 
   const { address, isConnected, connector } = useAccount()
   const { data: ensName } = useEnsName({ address })
-  const { connect, connectors, error: connectionError } = useConnect({
+  const { chain } = useNetwork()
+  const { connect, error: connectionError } = useConnect({
     connector: new MetaMaskConnector(),
-    onSuccess(connectionData){
+    onSuccess() { // returns connectionData
+      if (typeof chain === 'undefined') return // shuddup ts
       switch (chain.id) {
         case 1: // mainnet
           aiCocoContractAddress = '0x2c64a8d8462960a687E586F2b3303774390948Cb'
@@ -61,7 +57,6 @@ function Mint() {
     }
   })
 
-  const { chain } = useNetwork()
   if (chain) {
     let n = chain.network + '.'
     if (chain.network == 'homestead') n = ''
@@ -70,22 +65,23 @@ function Mint() {
 
   const dispatch = useAppDispatch()
 
-  const { totalBurned } = useAppSelector((state) => state.web3.totalBurned)
-
-  const message = useAppSelector((state) => state.display.message)
+  const totalBurned = useAppSelector((state) => state.web3.totalBurned)
 
   let error
   if (connectionError) {
-    if (connectionError.details) error = connectionError.details
-    else if (connectionError.message) error = connectionError.message + '. Get Metamask!'
+    //  if (connectionError.details) error = connectionError.details // ts says this doesnt exist 
+    if (connectionError.message) error = connectionError.message + '. Get Metamask!'
   }
+
+
+  const connectionString = 'Connected via:' + connector?.name + ' ' + chain?.name
 
   return (
     <div className="container">
       <div className="mintSection mint">
         <img className="headerImg"  src={gm}/>
         <h2 className="burnHeader">Burn coco to mint AiCoco tokens</h2>
-        {totalBurned > 0 && <>AiCoco NFT has burned {com(d(totalBurned, 18))} COCO!</>}
+        {Number(totalBurned) > 0 && <>AiCoco NFT has burned {com(d(totalBurned, 18))} COCO!</>}
       </div>
       <div className="mintSection mint">
         <>
@@ -104,7 +100,7 @@ function Mint() {
             </>
           }
           {error && <><br />Error: {error}</>}
-          {isConnected && <div className="smallTxt">Connected via: {connector.name} {chain.name}</div>}
+          {isConnected && <div className="smallTxt">{connectionString}</div>}
           <br />
           {isConnected && <MintControls />}
         </>

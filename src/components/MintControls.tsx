@@ -1,58 +1,69 @@
 import { useEffect } from 'react'
+import { createSelector } from 'reselect'
 import { useAppDispatch, useAppSelector } from '../app/hooks'
 
-import { Form, Field } from 'react-final-form'
+import { erc20ABI } from 'wagmi'
+
 import Decimals from '../utils/Decimals.js'
 const decimals = new Decimals()
-const { d, com, gte, lte, divide } = decimals
+const { d, com, gt, gte, lte, divide } = decimals
 
 import { updateCalc } from '../features/math/math-slice.ts'
-import { readyState, notReady } from '../features/web3/web3-slice.ts'
-import { causeError, clearError } from '../features/display-slice.ts'
+import { readyState } from '../features/web3/web3-slice.ts'
+import { causeError } from '../features/display-slice.ts'
 import { Tooltip } from 'react-tooltip'
 
 import MintApprove from './MintApprove.tsx'
 import MintToken from './MintToken.tsx'
 
 import { 
-  useAccount, 
-  useConnect, 
   useContractReads, 
-  useEnsName, 
-  useNetwork
 } from 'wagmi'
 
-import cocoAbi from '../utils/cocoAbi.json'
-import aiCocoAbi from '../utils/aiCocoAbi.json'
+import { aiCocoAbi } from '../utils/aiCocoAbi.ts'
+
+const selectAddressInfo = (state:any) => ({
+  address: state.web3.address,
+  aiCocoContractAddress: state.web3.aiCocoContractAddress,
+  cocoContractAddress: state.web3.cocoContractAddress
+})
+const memoizedAddressInfo = createSelector([selectAddressInfo], _ => _)
+
+const selectNumOfTokensInfo = (state:any) => state.math.numOfTokens
+const memoizedNumOfTokens = createSelector([selectNumOfTokensInfo], _ => _) 
+
+const contractReadData = (state:any) => ({
+  price: state.web3.price,
+  mintOpen: state.web3.mintOpen,
+  userBalance: state.web3.userBalance,
+  aiCocoAllowance: state.web3.aiCocoAllowance,
+  cidLength: state.web3.cidLength,
+  tokenCounter: state.web3.tokenCounter,
+  walletOfOwner: state.web3.walletOfOwner
+})
+const memoizedContractReadData = createSelector([contractReadData], _ => _)
+
+const errorData = (state:any) => ({
+  error: state.display.error,
+  errorMessage: state.display.errorMessage
+})
+const memoizedErrorData = createSelector([errorData], _ => _)
 
 function MintControls() {
 
   const dispatch = useAppDispatch()
-  const setTokens = (_numOfTokens) => {
-    dispatch(updateCalc({ numOfTokens: _numOfTokens, price: price }))
-  }
-
-  const { address, aiCocoContractAddress, cocoContractAddress } = useAppSelector((state) => ({
-    address: state.web3.address,
-    aiCocoContractAddress: state.web3.aiCocoContractAddress,
-    cocoContractAddress: state.web3.cocoContractAddress
-  }))
-
-  const numOfTokens = useAppSelector((state) => state.math.numOfTokens)
+  const { address, aiCocoContractAddress, cocoContractAddress } = useAppSelector(memoizedAddressInfo)
+  const numOfTokens = useAppSelector(memoizedNumOfTokens)
   const totalCoco = useAppSelector((state) => state.math.totalCoco)
   const wasApproved = useAppSelector((state) => state.web3.wasApproved)
   const doRefetch = useAppSelector((state) => state.web3.doRefetch)
-  const { error, errorMessage } = useAppSelector((state) => ({ 
-    error: state.display.error,
-    errorMessage: state.display.errorMessage
-  }))
+  const { error, errorMessage } = useAppSelector(memoizedErrorData)
+  const ready = useAppSelector((state) => state.web3.ready)
 
-  // So basically this hook calls the contracts readonly stuff, but we cant use the variables 
-  // because the onSuccess callback appears to be out of scope.
-  // so we have to send them to the reducer to get inserted in the redux state
-  // also set ready = true so that the display can show actual stuff
-  const remap = (data) => {
-    const map = []
+  const { price, mintOpen, userBalance, aiCocoAllowance, cidLength, tokenCounter, walletOfOwner } = useAppSelector(memoizedContractReadData)
+
+  const remap = (data: Array<any>) => {
+    const map: string[] = []
     data.forEach((d) => {
       if (d.status !== 'success') {
         map.push('error')
@@ -62,14 +73,13 @@ function MintControls() {
     })
     return map
   }
-
   const { refetch } = useContractReads({
     contracts: [
       { address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'totalBurned' },
       { address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'pricePerNft' },
       { address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'publicMintOpen' },
-      { address: cocoContractAddress, abi: cocoAbi, functionName: 'balanceOf', args: [address] },
-      { address: cocoContractAddress, abi: cocoAbi, functionName: 'allowance', args: [address, aiCocoContractAddress] }, // owner, spender
+      { address: cocoContractAddress, abi: erc20ABI, functionName: 'balanceOf', args: [address] },
+      { address: cocoContractAddress, abi: erc20ABI, functionName: 'allowance', args: [address, aiCocoContractAddress] }, // owner, spender
       { address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'cidLength' },
       { address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'tokenCounter' },
       { address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'walletOfOwner', args:[address] }, // owner
@@ -89,37 +99,29 @@ function MintControls() {
     },
     onError(error) {
       console.log('error, reads', error)
-    },
-    
+    }
   })
 
-  const ready = useAppSelector((state) => state.web3.ready)
-
-  const { totalBurned, price, mintOpen, userBalance, aiCocoAllowance, cidLength, tokenCounter, walletOfOwner } = useAppSelector((state) => ({
-    totalBurned: state.web3.totalBurned,
-    price: state.web3.price,
-    mintOpen: state.web3.mintOpen,
-    userBalance: state.web3.userBalance,
-    aiCocoAllowance: state.web3.aiCocoAllowance,
-    cidLength: state.web3.cidLength,
-    tokenCounter: state.web3.tokenCounter,
-    walletOfOwner: state.web3.walletOfOwner
-  }))
-
+  // when refetched, update tokenCalc
   useEffect(() => {
     if (doRefetch) {
       refetch()
-      if (aiCocoAllowance > 0 && price > 0) {
-        let tokens = divide(aiCocoAllowance, price)
-        tokens = Math.trunc(tokens)
+      if (gt(aiCocoAllowance, '0') && gt(price, '0')) {
+        const tokensStr = divide(aiCocoAllowance, price)
+        let tokens = Math.trunc(Number(tokensStr))
         if (tokens > 5) tokens = 5
         setTokens(tokens, price)
-        // document.getElementById("r" + tokens).checked = true
+        // document.getElementById("r" + tokens).checked = true // ideally update the form to check checked
       }
     }
   })
 
+  const setTokens = (_numOfTokens: number, _price: string) => {
+    dispatch(updateCalc({ numOfTokens: _numOfTokens, price: _price }))
+  }
+
   const nftsAvailable = cidLength - tokenCounter
+
   if (error) {
     console.log('error: ' + errorMessage)
     return (<div>
@@ -145,6 +147,8 @@ function MintControls() {
 
                 <div className="smallTxt">Your COCO Balance: {com(d(userBalance, 18))}</div>
                 {walletOfOwner > 0 && <div className="smallTxt">You own {walletOfOwner} AiCoco NFT's<br /></div>}
+                <div className="smallTxt">Current contract Allowance {com(d(aiCocoAllowance, 18))}</div>
+
                 <br />
 
                     <Tooltip id="buttons-tip" />
@@ -174,7 +178,6 @@ function MintControls() {
                   Step 1 of 2: <br />
                    {gte(aiCocoAllowance, totalCoco) && gte(userBalance, totalCoco) &&
                     <>
-                      Current contract Allowance: {com(d(aiCocoAllowance, 18))}<br />
                       <div className="burnHeader">OK to mint {numOfTokens} NFT {numOfTokens > 1 && <>'s!</>}</div>
                       <br /><br />
                     </>

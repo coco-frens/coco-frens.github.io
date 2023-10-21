@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 
 interface DisplayState {
   error: boolean
@@ -9,9 +9,9 @@ interface DisplayState {
 
 const initialState: DisplayState = {
   error: false,
-  errorMessage: null,
+  errorMessage: '',
   message: false,
-  messageText: null
+  messageText: ''
 }
 
 const displaySlice = createSlice({
@@ -22,15 +22,15 @@ const displaySlice = createSlice({
       state.error = true
       state.errorMessage = args.payload.errorMessage
     },
-    clearError(state, args) {
+    clearError(state) {
       state.error = false
-      state.errorMessage = null
+      state.errorMessage = ''
     },
     causeMessage(state, args) {
       state.message = true
       state.messageText = args.payload
     },
-    clearMessage(state, args) {
+    clearMessage(state) {
       state.message = false
       state.messageText = ''
     }

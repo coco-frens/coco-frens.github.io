@@ -1,33 +1,43 @@
-import { ethers, BigNumber } from 'ethers'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 
-import cocoAbi from '../../utils/cocoAbi.json'
-import aiCocoAbi from '../../utils/aiCocoAbi.json'
+import {  } from 'wagmi'
 
 interface Web3State {
   ready: boolean
   price: string
   allowance: string
   totalBurned: string
-  mintingStatus: string
+  mintOpen:boolean
   userCocoBalance: string
   aiCocoAllowance: string
   cidLength: number
   tokenCounter: number
   doRefetch: boolean
+  address: `0x${string}`
+  aiCocoContractAddress: `0x${string}`
+  cocoContractAddress: `0x${string}`
+  wasApproved:boolean
+  userBalance:string
+  walletOfOwner: number
 }
 
 const initialState: Web3State = {
   ready: false,
-  price: '',
-  allowance: '',
-  totalBurned: '',
-  mintingStatus: false,
-  userCocoBalance: '',
-  aiCocoAllowance: '',
-  cidLength: 0,
+  price: '-1',
+  allowance: 'null',
+  totalBurned: 'null',
+  mintOpen: false,
+  userCocoBalance: '-1',
+  aiCocoAllowance: '-1',
+  cidLength: -1,
   tokenCounter: 0,
-  doRefetch: false
+  doRefetch: false,
+  address: '0x',
+  aiCocoContractAddress: '0x',
+  cocoContractAddress: '0x',
+  wasApproved: false,
+  userBalance: '-1',
+  walletOfOwner: -1,
 }
 
 const web3Slice = createSlice({
@@ -55,19 +65,19 @@ const web3Slice = createSlice({
       state.doRefetch = false
     },
 
-    updateCalc(state, args) {
+    updateCalc(state) {
       state.price = state.price
     },
 
-    notReady(state, args) {
+    notReady(state) {
       state.ready = false
     },
 
-    approveSuccess(state, args) {
+    approveSuccess(state) {
       state.wasApproved = true
     },
 
-    getNewContractData(state, args){
+    getNewContractData(state){
       state.doRefetch = true
     }
 

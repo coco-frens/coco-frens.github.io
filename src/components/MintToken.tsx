@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createSelector } from 'reselect'
 
 import {
   usePrepareContractWrite,
@@ -13,42 +14,28 @@ import { getNewContractData } from '../features/web3/web3-slice.ts'
 
 let once = 0
 
+const selectAddressInfo = (state:any) => ({
+  aiCocoContractAddress: state.web3.aiCocoContractAddress,
+})
+const memoizedAddressInfo = createSelector([selectAddressInfo], _ => _)
+
 function MintToken() {
 
   const dispatch = useAppDispatch()
 
-  let address
-  let aiCocoContractAddress
-  useAppSelector((state) => {
-    address = state.web3.address
-    aiCocoContractAddress = state.web3.aiCocoContractAddress
-  })
-
+  const { aiCocoContractAddress } = useAppSelector(memoizedAddressInfo)
   const numOfTokens = useAppSelector((state) => state.math.numOfTokens)
 
   const { config } = usePrepareContractWrite({
     address: aiCocoContractAddress, abi: aiCocoAbi, functionName: 'publicMintMulti', args: [numOfTokens]
   })
-
   const { data, isLoading, isSuccess, isError, error, write, reset } = useContractWrite(config)
 
   const hash = data?.hash
 
-  const { data: broadcastData, isSuccess: isBroadcasted, isError: broadcastError, isLoading: broadcastLoading } = useWaitForTransaction({
+  const { isFetching: txData, isSuccess: isBroadcasted } = useWaitForTransaction({
     hash: hash,
   })
-
-  const clearErrorMsg = () => {
-    reset()
-    console.log('clearError Msg')
-  }
-
-  const clicked = () => {
-    console.log('Minting...')
-    console.log('Tokens: ' + numOfTokens)
-    console.log('Address: ' + address)
-  }
-
   useEffect(() => {
     if (isBroadcasted) {
       if (once === 0) {
@@ -59,10 +46,22 @@ function MintToken() {
     }
   })
 
-  if (isError) {
+  const clearErrorMsg = () => {
+    reset()
+  }
+
+  if (isError && error) {
     // In this case we want the button to dissappear and let the error be seen, then auto reset after a few seconds
     setTimeout(clearErrorMsg, 3000)
-    return (<div>Error: {error.details}</div>)
+    const errorString = error.message
+    return (<div>Error: {errorString}</div>)
+  } else if (isLoading || txData){
+    return (
+      <div>
+        <button disabled={true} className="btn-disabled" >Minting</button>
+        {isSuccess && <div className="smallTxt">Transaction: {hash}</div>}
+      </div>
+    )
   } else {
     return (
       <div>
@@ -73,12 +72,11 @@ function MintToken() {
           data-tooltip-content="App is ready to Mint AiCoco. Make sure you confirm in MetaMask!"
           data-tooltip-place="top"
           disabled={!write}
-          onClick={() => { clicked(); write?.(); }}
+          onClick={() => { write?.(); }}
         >Mint AiCoco
         </button>
         {isLoading && <div>Check Wallet...</div>}
         {isSuccess && <div className="smallTxt">Transaction: {hash}</div>}
-        {isError && <div>Error: {error.details}</div>}
       </div>
     )
   }

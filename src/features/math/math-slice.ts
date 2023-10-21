@@ -1,15 +1,15 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 import Decimals from '../../utils/Decimals.js'
 const decimals = new Decimals()
 const { multBigN } = decimals
 
 interface MathState {
-  totalCoco: number
+  totalCoco: string
   numOfTokens: number
 }
 
 const initialState: MathState = {
-  totalCoco: 0,
+  totalCoco: '0',
   numOfTokens: 0
 }
 
