@@ -107,8 +107,10 @@ function Mint() {
       </div>
       {isConnected &&
         <div className="mintSection mint">
-          <a href={etherscanUrl} target="_blank">View the token contract</a><br />
-          <a href="https://opensea.io/collection/aicoco?" target="_blank">https://opensea.io/collection/aicoco?</a><br />
+          <a href="https://rarible.com/aicoco" target="_blank">On Rarible</a><br />
+          <a href="https://opensea.io/collection/aicoco?" target="_blank">On OpenSea</a><br />
+          <a href={etherscanUrl} target="_blank">View contract on Etherscan</a><br />
+          <a href="https://github.com/coco-frens" target="_blank">On Github</a><br/>
           <Link to="/">Home</Link> | Mint |  <Link to="/Sets">Sets</Link>
         </div>
       }
