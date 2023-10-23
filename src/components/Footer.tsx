@@ -1,7 +1,10 @@
-import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { Link } from 'react-router-dom'
 
-function Footer(props) {
+interface FooterType {
+  page: string
+}
+
+function Footer(props:FooterType) {
 
   const home = props.page === 'home' ? 'Home  | ' : <><Link to="/home">Home</Link> | </>
   const mint = props.page === 'mint' ? 'Mint  | ' : <><Link to="/mint">Mint</Link> | </>

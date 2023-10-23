@@ -6,7 +6,7 @@ import {
   useEnsName, 
   useNetwork 
 } from 'wagmi'
-import { Link } from 'react-router-dom'
+
 import { Tooltip } from 'react-tooltip'
 // import { InjectedConnector } from 'wagmi/connectors/injected'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
@@ -24,7 +24,6 @@ import Footer from './Footer.tsx'
 
 let aiCocoContractAddress: `0x${string}`
 let cocoContractAddress: `0x${string}`
-let etherscanUrl: string
 
 function Mint() {
 
@@ -57,12 +56,6 @@ function Mint() {
       dispatch(initedState(readyData))
     }
   })
-
-  if (chain) {
-    let n = chain.network + '.'
-    if (chain.network == 'homestead') n = ''
-    etherscanUrl = 'https://' + n + 'etherscan.io/address/' + aiCocoContractAddress + '#code'
-  }
 
   const dispatch = useAppDispatch()
 

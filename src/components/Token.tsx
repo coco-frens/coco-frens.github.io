@@ -1,5 +1,3 @@
-import { useAppDispatch, useAppSelector } from '../app/hooks'
-import { Link } from 'react-router-dom'
 import Footer from './Footer.tsx'
 
 function Token() {
