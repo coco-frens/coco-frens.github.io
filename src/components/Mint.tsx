@@ -20,6 +20,7 @@ const decimals = new Decimals()
 const { com, d } = decimals
 
 import './Mint.css'
+import Footer from './Footer.tsx'
 
 let aiCocoContractAddress: `0x${string}`
 let cocoContractAddress: `0x${string}`
@@ -105,15 +106,7 @@ function Mint() {
           {isConnected && <MintControls />}
         </>
       </div>
-      {isConnected &&
-        <div className="mintSection mint">
-          <a href="https://rarible.com/aicoco" target="_blank">On Rarible</a><br />
-          <a href="https://opensea.io/collection/aicoco?" target="_blank">On OpenSea</a><br />
-          <a href={etherscanUrl} target="_blank">View contract on Etherscan</a><br />
-          <a href="https://github.com/coco-frens" target="_blank">On Github</a><br/>
-          <Link to="/">Home</Link> | Mint |  <Link to="/Sets">Sets</Link>
-        </div>
-      }
+      <Footer page="mint" />
     </div>
 
   )
